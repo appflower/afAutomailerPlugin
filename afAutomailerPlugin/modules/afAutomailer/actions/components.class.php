@@ -22,12 +22,14 @@ class afAutomailerComponents extends sfComponents
                 $this->getContext()->getConfiguration()->loadHelpers('Partial');
 		
                 $email = $this->getRequest()->getAttribute('email');
+                $subject = $this->getRequest()->getAttribute('subject');
+                $from = $this->getRequest()->getAttribute('from');
 
                 $mail = new Automailer();
                 $mail->setToEmail($email);
                 $mail->setFromEmail('no-reply@'.sfConfig::get('app_domain'));
-                $mail->setFromName('od');
-                $mail->setSubject('temat');
+                $mail->setFromName($from);
+                $mail->setSubject($subject);
                 $mail->setIsHtml(1);
                 $mail->setSentDate(time());
                 $mail->setContent($mailModule, $mailTemplate, array('email' => $email));
