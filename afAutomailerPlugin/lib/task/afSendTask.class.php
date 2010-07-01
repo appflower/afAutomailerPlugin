@@ -23,8 +23,7 @@ EOF;
     $databaseManager = new sfDatabaseManager($this->configuration);
     $connection = Propel::getConnection($options['connection'] ? $options['connection'] : '');
     
-    $afAutomailer = new afAutomailer();
-    $automailer_objs = $afAutomailer->getUnsentEmails();
+    $automailer_objs = AutomailerPeer::getUnsentEmails();
 
     if(count($automailer_objs)>0)
     {
@@ -32,7 +31,7 @@ EOF;
       {
         // only proceed if and only if there is a source and a destination
         if ($automailer_obj->getFromEmail() != '' && $automailer_obj->getToEmail() != '') {
-          $afAutomailer->sendMail($automailer_obj);
+          afAutomailer::sendMail($automailer_obj);
         }
       }
     }

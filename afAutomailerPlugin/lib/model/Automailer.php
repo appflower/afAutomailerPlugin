@@ -2,20 +2,33 @@
 
 class Automailer extends BaseAutomailer
 {
-	public function setContent($module,$partial,$vars)
-	{
-		$body=get_partial($module.'/'.$partial,$vars);
+    public function setContent($module, $partial, $vars)
+    {
+        sfContext::getInstance()->getConfiguration()->loadHelpers('Partial');
 
-		if($body)
-		{
-			parent::setBody($body);
-		}
+        $body = get_partial($module.'/'.$partial, $vars);
 
-		$alt_body=get_partial($module.'/'.$partial.'.altbody',$vars);
+        if($body)
+        {
+                parent::setBody($body);
+        }
 
-		if($alt_body)
-		{
-			parent::setAltBody($alt_body);
-		}
-	}
+        $alt_body = get_partial($module.'/'.$partial.'.altbody', $vars);
+
+        if($alt_body)
+        {
+                parent::setAltBody($alt_body);
+        }
+    }
+
+
+    public function markSubmitted() {
+        $this->setIsSent(1);
+        $this->save();
+    }
+
+    public function markFailed() {
+        $this->setIsFailed(1);
+        $this->save();
+    }
 }
