@@ -6,18 +6,20 @@ class Automailer extends BaseAutomailer
     {
         sfContext::getInstance()->getConfiguration()->loadHelpers('Partial');
 
-        $body = get_partial($module.'/'.$partial, $vars);
+        $pathToModules = sfConfig::get('sf_root_dir').'/apps/'.sfContext::getInstance()->getConfiguration()->getApplication().'/modules';
+        $bodyPath = $pathToModules.'/'.$module.'/templates/_'.$partial.'.php';
+        $altBodyPath = $pathToModules.'/'.$module.'/templates/_'.$partial.'.altbody.php';
 
-        if($body)
+        if(file_exists($bodyPath))
         {
-                parent::setBody($body);
+            $body = get_partial($module.'/'.$partial, $vars);
+            parent::setBody($body);
         }
 
-        $alt_body = get_partial($module.'/'.$partial.'.altbody', $vars);
-
-        if($alt_body)
+        if(file_exists($altBodyPath))
         {
-                parent::setAltBody($alt_body);
+            $alt_body = get_partial($module.'/'.$partial.'.altbody', $vars);
+            parent::setAltBody($alt_body);
         }
     }
 
