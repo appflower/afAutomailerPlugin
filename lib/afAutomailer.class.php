@@ -27,7 +27,12 @@ class afAutomailer {
               $mail->AddAddress($automailer_obj->getToEmail());
 
               if ($mail->Send()) {
-                  $automailer_obj->markSubmitted();
+                  if( sfConfig::get('app_afAutomailerPlugin_delete_on_success') ) {
+                      $automailer_obj->delete();
+                  } else {
+                      $automailer_obj->markSubmitted();
+                  }
+
                   return true;
               }
               else {

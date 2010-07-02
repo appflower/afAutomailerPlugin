@@ -13,7 +13,7 @@ Call it with:
 
   [php symfony afAutomailerPlugin:send|INFO]
 EOF;
-//    $this->addArgument('application', sfCommandArgument::OPTIONAL, 'The application name', 'frontend' );
+    $this->addArgument('application', sfCommandArgument::OPTIONAL, 'The application name', 'frontend' );
     $this->addOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'prod');
     $this->addOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel');
   }
