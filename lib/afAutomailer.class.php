@@ -34,7 +34,12 @@ class afAutomailer {
             }
 
             if ($mail->send($message) > 0) {
-                $automailer_obj->markSubmitted();
+		if( sfConfig::get('app_afAutomailerPlugin_delete_on_success') ) {
+                      $automailer_obj->delete();
+		} else {
+		    $automailer_obj->markSubmitted();
+		}
+
                 return true;
             }
             else {
