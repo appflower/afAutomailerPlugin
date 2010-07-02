@@ -1,0 +1,50 @@
+propel:
+  _attributes:    { package: plugins.afAutomailerPlugin.lib.model }
+  
+  ########################################################
+  # - AUTOMAILER by radu --------------------------------#
+  ########################################################
+  automailer:
+    _attributes:
+      idMethod: native
+    id:
+      type: INTEGER
+      required: 1
+      autoIncrement: true
+      primaryKey: true
+    from_email:
+      type: VARCHAR
+      size: 255
+      required: true
+      default:
+    from_name:
+      type: VARCHAR
+      size: 255
+    to_email:
+      type: VARCHAR
+      size: 255
+      required: true
+      default:
+    subject:
+      type: LONGVARCHAR
+      required: true
+    body:
+      type: LONGVARCHAR
+      required: true
+    alt_body:
+      type: LONGVARCHAR
+    sent_date:
+      type: TIMESTAMP
+    is_sent:
+      type: TINYINT
+      required: true
+      default: 0
+    is_html:
+      type: TINYINT
+      required: true
+      default: 0
+    is_failed:
+      type: TINYINT
+      required: true
+      default: 0
+      
