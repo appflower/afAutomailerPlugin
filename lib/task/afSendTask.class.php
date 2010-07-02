@@ -4,6 +4,18 @@ class afSendTask extends sfPropelBaseTask
 {
   protected function configure()
   {
+    // // add your own arguments here
+    // $this->addArguments(array(
+    //   new sfCommandArgument('my_arg', sfCommandArgument::REQUIRED, 'My argument'),
+    // ));
+
+    $this->addOptions(array(
+      new sfCommandOption('application', null, sfCommandOption::PARAMETER_REQUIRED, 'frontend'),
+      new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'prod'),
+      new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel'),
+      // add your own options here
+    ));
+
     $this->namespace        = 'afAutomailerPlugin';
     $this->name             = 'send';
     $this->briefDescription = 'Sends not sent emails';
@@ -13,16 +25,14 @@ Call it with:
 
   [php symfony afAutomailerPlugin:send|INFO]
 EOF;
-//    $this->addArgument('application', sfCommandArgument::OPTIONAL, 'The application name', 'frontend' );
-    $this->addOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'prod');
-    $this->addOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel');
   }
 
   protected function execute($arguments = array(), $options = array())
   {
+    // initialize the database connection
     $databaseManager = new sfDatabaseManager($this->configuration);
-    $connection = Propel::getConnection($options['connection'] ? $options['connection'] : '');
-    
+    $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
+
     $automailer_objs = AutomailerPeer::getUnsentEmails();
 
     if(count($automailer_objs)>0)

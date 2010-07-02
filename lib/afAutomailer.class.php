@@ -16,24 +16,31 @@ class afAutomailer {
 
         public static function sendMail($automailer_obj)
         {
-              $mail = new PHPMailer();
-              $mail->IsMail();
-              $mail->From     = $automailer_obj->getFromEmail();
-              $mail->FromName = $automailer_obj->getFromName();
-              $mail->IsHTML(($automailer_obj->getIsHtml()==1 ? true : false));
-              $mail->Subject  = $automailer_obj->getSubject();
-              $mail->Body     = $automailer_obj->getBody();
-              $mail->AltBody  = $automailer_obj->getAltBody();
-              $mail->AddAddress($automailer_obj->getToEmail());
+            $frontendConfiguration = sfProjectConfiguration::getApplicationConfiguration('frontend', 'dev', true);
+            $instance = sfContext::createInstance($frontendConfiguration);
 
-              if ($mail->Send()) {
-                  $automailer_obj->markSubmitted();
-                  return true;
-              }
-              else {
-                  $automailer_obj->markFailed();
-                  return false;
-              }
+            $mail = $instance->getMailer();
+
+            $message = Swift_Message::newInstance()
+              ->setFrom($automailer_obj->getFromEmail(), $automailer_obj->getFromName())
+              ->setTo($automailer_obj->getToEmail())
+              ->setSubject($automailer_obj->getSubject())
+              ->setBody($automailer_obj->getBody())
+              ->addPart($automailer_obj->getAltBody(), 'text/plain');
+            ;
+
+            if($automailer_obj->getIsHtml()) {
+                $message->setContentType("text/html");
+            }
+
+            if ($mail->send($message) > 0) {
+                $automailer_obj->markSubmitted();
+                return true;
+            }
+            else {
+                $automailer_obj->markFailed();
+                return false;
+            }
         }
 
 }
