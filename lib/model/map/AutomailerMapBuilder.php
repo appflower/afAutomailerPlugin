@@ -2,7 +2,7 @@
 
 
 /**
- * This class adds structure of 'automailer' table to 'propel' DatabaseMap object.
+ * This class adds structure of 'af_automailer' table to 'propel' DatabaseMap object.
  *
  *
  *

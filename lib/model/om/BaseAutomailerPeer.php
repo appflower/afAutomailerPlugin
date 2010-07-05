@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'automailer' table.
+ * Base static class for performing query and update operations on the 'af_automailer' table.
  *
  * 
  *
@@ -13,7 +13,7 @@ abstract class BaseAutomailerPeer {
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'automailer';
+	const TABLE_NAME = 'af_automailer';
 
 	/** A class that can be returned by this peer. */
 	const CLASS_DEFAULT = 'plugins.afAutomailerPlugin.lib.model.Automailer';
@@ -25,37 +25,37 @@ abstract class BaseAutomailerPeer {
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'automailer.ID';
+	const ID = 'af_automailer.ID';
 
 	/** the column name for the FROM_EMAIL field */
-	const FROM_EMAIL = 'automailer.FROM_EMAIL';
+	const FROM_EMAIL = 'af_automailer.FROM_EMAIL';
 
 	/** the column name for the FROM_NAME field */
-	const FROM_NAME = 'automailer.FROM_NAME';
+	const FROM_NAME = 'af_automailer.FROM_NAME';
 
 	/** the column name for the TO_EMAIL field */
-	const TO_EMAIL = 'automailer.TO_EMAIL';
+	const TO_EMAIL = 'af_automailer.TO_EMAIL';
 
 	/** the column name for the SUBJECT field */
-	const SUBJECT = 'automailer.SUBJECT';
+	const SUBJECT = 'af_automailer.SUBJECT';
 
 	/** the column name for the BODY field */
-	const BODY = 'automailer.BODY';
+	const BODY = 'af_automailer.BODY';
 
 	/** the column name for the ALT_BODY field */
-	const ALT_BODY = 'automailer.ALT_BODY';
+	const ALT_BODY = 'af_automailer.ALT_BODY';
 
 	/** the column name for the SENT_DATE field */
-	const SENT_DATE = 'automailer.SENT_DATE';
+	const SENT_DATE = 'af_automailer.SENT_DATE';
 
 	/** the column name for the IS_SENT field */
-	const IS_SENT = 'automailer.IS_SENT';
+	const IS_SENT = 'af_automailer.IS_SENT';
 
 	/** the column name for the IS_HTML field */
-	const IS_HTML = 'automailer.IS_HTML';
+	const IS_HTML = 'af_automailer.IS_HTML';
 
 	/** the column name for the IS_FAILED field */
-	const IS_FAILED = 'automailer.IS_FAILED';
+	const IS_FAILED = 'af_automailer.IS_FAILED';
 
 	/**
 	 * An identiy map to hold any loaded instances of Automailer objects.
@@ -598,7 +598,7 @@ abstract class BaseAutomailerPeer {
   }
 
 	/**
-	 * Method to DELETE all rows from the automailer table.
+	 * Method to DELETE all rows from the af_automailer table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */

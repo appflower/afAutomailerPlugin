@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base class that represents a row from the 'automailer' table.
+ * Base class that represents a row from the 'af_automailer' table.
  *
  * 
  *
