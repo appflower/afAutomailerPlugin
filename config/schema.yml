@@ -4,8 +4,9 @@ propel:
   ########################################################
   # - AUTOMAILER by radu --------------------------------#
   ########################################################
-  automailer:
+  af_automailer:
     _attributes:
+      phpName: Automailer
       idMethod: native
     id:
       type: INTEGER

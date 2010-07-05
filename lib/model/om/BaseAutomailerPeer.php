@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'automailer' table.
+ * Base static class for performing query and update operations on the 'af_automailer' table.
  *
  * 
  *

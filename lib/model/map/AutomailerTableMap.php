@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'automailer' table.
+ * This class defines the structure of the 'af_automailer' table.
  *
  *
  *
