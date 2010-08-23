@@ -25,16 +25,22 @@ EOF;
     
     $automailer_objs = AutomailerPeer::getUnsentEmails();
 
+    $counter = 0;
     if(count($automailer_objs)>0)
     {
       foreach ($automailer_objs as $k=>$automailer_obj)
       {
+
         // only proceed if and only if there is a source and a destination
         if ($automailer_obj->getFromEmail() != '' && $automailer_obj->getToEmail() != '') {
-          afAutomailer::sendMail($automailer_obj);
+          if (afAutomailer::sendMail($automailer_obj)) {
+              $counter++;
+          }
         }
       }
     }
-    
+
+    $this->log("Nr of emails send: $counter");
+    return 0;
   }
 }
