@@ -1,7 +1,7 @@
 <?php
 class afAutomailer {
 
-        public static function saveMail($mailModule, $mailTemplate, $parameters)
+        public static function saveMail($mailModule, $mailTemplate, $parameters, $sendAt = null)
 	{
             $mail = new Automailer();
             $mail->setToEmail($parameters['email']);
@@ -17,6 +17,7 @@ class afAutomailer {
             $mail->setIsHtml(1);
             $mail->setSentDate(time());
             $mail->setContent($mailModule, $mailTemplate, $parameters);
+            $mail->setSendAtDate($sendAt);
             $mail->save();
 	}
 

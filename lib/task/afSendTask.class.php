@@ -23,7 +23,7 @@ EOF;
     $databaseManager = new sfDatabaseManager($this->configuration);
     $connection = Propel::getConnection($options['connection'] ? $options['connection'] : '');
     
-    $automailer_objs = AutomailerPeer::getUnsentEmails();
+    $automailer_objs = AutomailerPeer::getEmailsForSending();
 
     $counter = 0;
     if(count($automailer_objs)>0)
