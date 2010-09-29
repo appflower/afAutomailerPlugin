@@ -10,6 +10,8 @@
 abstract class BaseAutomailer extends BaseObject  implements Persistent {
 
 
+  const PEER = 'AutomailerPeer';
+
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
@@ -67,6 +69,12 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	protected $sent_date;
 
 	/**
+	 * The value for the send_at_date field.
+	 * @var        string
+	 */
+	protected $send_at_date;
+
+	/**
 	 * The value for the is_sent field.
 	 * Note: this column has a database default value of: 0
 	 * @var        int
@@ -100,10 +108,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 * @var        boolean
 	 */
 	protected $alreadyInValidation = false;
-
-	// symfony behavior
-	
-	const PEER = 'AutomailerPeer';
 
 	/**
 	 * Applies default values to this object.
@@ -223,6 +227,44 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 				$dt = new DateTime($this->sent_date);
 			} catch (Exception $x) {
 				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->sent_date, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// Because propel.useDateTimeClass is TRUE, we return a DateTime object.
+			return $dt;
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [send_at_date] column value.
+	 * 
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw DateTime object will be returned.
+	 * @return     mixed Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getSendAtDate($format = 'Y-m-d H:i:s')
+	{
+		if ($this->send_at_date === null) {
+			return null;
+		}
+
+
+		if ($this->send_at_date === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->send_at_date);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->send_at_date, true), $x);
 			}
 		}
 
@@ -456,6 +498,55 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	} // setSentDate()
 
 	/**
+	 * Sets the value of [send_at_date] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     Automailer The current object (for fluent API support)
+	 */
+	public function setSendAtDate($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->send_at_date !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->send_at_date !== null && $tmpDt = new DateTime($this->send_at_date)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->send_at_date = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = AutomailerPeer::SEND_AT_DATE;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setSendAtDate()
+
+	/**
 	 * Set the value of [is_sent] column.
 	 * 
 	 * @param      int $v new value
@@ -567,9 +658,10 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			$this->body = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->alt_body = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->sent_date = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->is_sent = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->is_html = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->is_failed = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->send_at_date = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->is_sent = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->is_html = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->is_failed = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -579,7 +671,7 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = AutomailerPeer::NUM_COLUMNS - AutomailerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = AutomailerPeer::NUM_COLUMNS - AutomailerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Automailer object", $e);
@@ -655,6 +747,17 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 */
 	public function delete(PropelPDO $con = null)
 	{
+
+    foreach (sfMixer::getCallables('BaseAutomailer:delete:pre') as $callable)
+    {
+      $ret = call_user_func($callable, $this, $con);
+      if ($ret)
+      {
+        return;
+      }
+    }
+
+
 		if ($this->isDeleted()) {
 			throw new PropelException("This object has already been deleted.");
 		}
@@ -666,26 +769,9 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
-			// symfony_behaviors behavior
-			foreach (sfMixer::getCallables('BaseAutomailer:delete:pre') as $callable)
-			{
-			  if (call_user_func($callable, $this, $con))
-			  {
-			    $con->commit();
-			
-			    return;
-			  }
-			}
-
 			if ($ret) {
 				AutomailerPeer::doDelete($this, $con);
 				$this->postDelete($con);
-				// symfony_behaviors behavior
-				foreach (sfMixer::getCallables('BaseAutomailer:delete:post') as $callable)
-				{
-				  call_user_func($callable, $this, $con);
-				}
-
 				$this->setDeleted(true);
 				$con->commit();
 			} else {
@@ -695,8 +781,14 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			$con->rollBack();
 			throw $e;
 		}
-	}
+	
 
+    foreach (sfMixer::getCallables('BaseAutomailer:delete:post') as $callable)
+    {
+      call_user_func($callable, $this, $con);
+    }
+
+  }
 	/**
 	 * Persists this object to the database.
 	 *
@@ -712,6 +804,17 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 */
 	public function save(PropelPDO $con = null)
 	{
+
+    foreach (sfMixer::getCallables('BaseAutomailer:save:pre') as $callable)
+    {
+      $affectedRows = call_user_func($callable, $this, $con);
+      if (is_int($affectedRows))
+      {
+        return $affectedRows;
+      }
+    }
+
+
 		if ($this->isDeleted()) {
 			throw new PropelException("You cannot save an object that has been deleted.");
 		}
@@ -724,17 +827,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		$isInsert = $this->isNew();
 		try {
 			$ret = $this->preSave($con);
-			// symfony_behaviors behavior
-			foreach (sfMixer::getCallables('BaseAutomailer:save:pre') as $callable)
-			{
-			  if (is_integer($affectedRows = call_user_func($callable, $this, $con)))
-			  {
-			    $con->commit();
-			
-			    return $affectedRows;
-			  }
-			}
-
 			if ($isInsert) {
 				$ret = $ret && $this->preInsert($con);
 			} else {
@@ -748,17 +840,16 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 					$this->postUpdate($con);
 				}
 				$this->postSave($con);
-				// symfony_behaviors behavior
-				foreach (sfMixer::getCallables('BaseAutomailer:save:post') as $callable)
-				{
-				  call_user_func($callable, $this, $con, $affectedRows);
-				}
-
 				AutomailerPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
 			$con->commit();
+    foreach (sfMixer::getCallables('BaseAutomailer:save:post') as $callable)
+    {
+      call_user_func($callable, $this, $con, $affectedRows);
+    }
+
 			return $affectedRows;
 		} catch (PropelException $e) {
 			$con->rollBack();
@@ -934,12 +1025,15 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 				return $this->getSentDate();
 				break;
 			case 8:
-				return $this->getIsSent();
+				return $this->getSendAtDate();
 				break;
 			case 9:
-				return $this->getIsHtml();
+				return $this->getIsSent();
 				break;
 			case 10:
+				return $this->getIsHtml();
+				break;
+			case 11:
 				return $this->getIsFailed();
 				break;
 			default:
@@ -971,9 +1065,10 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			$keys[5] => $this->getBody(),
 			$keys[6] => $this->getAltBody(),
 			$keys[7] => $this->getSentDate(),
-			$keys[8] => $this->getIsSent(),
-			$keys[9] => $this->getIsHtml(),
-			$keys[10] => $this->getIsFailed(),
+			$keys[8] => $this->getSendAtDate(),
+			$keys[9] => $this->getIsSent(),
+			$keys[10] => $this->getIsHtml(),
+			$keys[11] => $this->getIsFailed(),
 		);
 		return $result;
 	}
@@ -1030,12 +1125,15 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 				$this->setSentDate($value);
 				break;
 			case 8:
-				$this->setIsSent($value);
+				$this->setSendAtDate($value);
 				break;
 			case 9:
-				$this->setIsHtml($value);
+				$this->setIsSent($value);
 				break;
 			case 10:
+				$this->setIsHtml($value);
+				break;
+			case 11:
 				$this->setIsFailed($value);
 				break;
 		} // switch()
@@ -1070,9 +1168,10 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setBody($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setAltBody($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setSentDate($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setIsSent($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setIsHtml($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setIsFailed($arr[$keys[10]]);
+		if (array_key_exists($keys[8], $arr)) $this->setSendAtDate($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setIsSent($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setIsHtml($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setIsFailed($arr[$keys[11]]);
 	}
 
 	/**
@@ -1092,6 +1191,7 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AutomailerPeer::BODY)) $criteria->add(AutomailerPeer::BODY, $this->body);
 		if ($this->isColumnModified(AutomailerPeer::ALT_BODY)) $criteria->add(AutomailerPeer::ALT_BODY, $this->alt_body);
 		if ($this->isColumnModified(AutomailerPeer::SENT_DATE)) $criteria->add(AutomailerPeer::SENT_DATE, $this->sent_date);
+		if ($this->isColumnModified(AutomailerPeer::SEND_AT_DATE)) $criteria->add(AutomailerPeer::SEND_AT_DATE, $this->send_at_date);
 		if ($this->isColumnModified(AutomailerPeer::IS_SENT)) $criteria->add(AutomailerPeer::IS_SENT, $this->is_sent);
 		if ($this->isColumnModified(AutomailerPeer::IS_HTML)) $criteria->add(AutomailerPeer::IS_HTML, $this->is_html);
 		if ($this->isColumnModified(AutomailerPeer::IS_FAILED)) $criteria->add(AutomailerPeer::IS_FAILED, $this->is_failed);
@@ -1163,6 +1263,8 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 
 		$copyObj->setSentDate($this->sent_date);
 
+		$copyObj->setSendAtDate($this->send_at_date);
+
 		$copyObj->setIsSent($this->is_sent);
 
 		$copyObj->setIsHtml($this->is_html);
@@ -1230,21 +1332,16 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 
 	}
 
-	// symfony_behaviors behavior
-	
-	/**
-	 * Calls methods defined via {@link sfMixer}.
-	 */
-	public function __call($method, $arguments)
-	{
-	  if (!$callable = sfMixer::getCallable('BaseAutomailer:'.$method))
-	  {
-	    throw new sfException(sprintf('Call to undefined method BaseAutomailer::%s', $method));
-	  }
-	
-	  array_unshift($arguments, $this);
-	
-	  return call_user_func_array($callable, $arguments);
-	}
+  public function __call($method, $arguments)
+  {
+    if (!$callable = sfMixer::getCallable('BaseAutomailer:'.$method))
+    {
+      throw new sfException(sprintf('Call to undefined method BaseAutomailer::%s', $method));
+    }
+
+    array_unshift($arguments, $this);
+
+    return call_user_func_array($callable, $arguments);
+  }
 
 } // BaseAutomailer

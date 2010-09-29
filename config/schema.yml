@@ -36,6 +36,9 @@ propel:
       type: LONGVARCHAR
     sent_date:
       type: TIMESTAMP
+    send_at_date:
+      type: TIMESTAMP
+      required: true
     is_sent:
       type: TINYINT
       required: true

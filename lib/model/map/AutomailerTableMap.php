@@ -30,7 +30,7 @@ class AutomailerTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('automailer');
+		$this->setName('af_automailer');
 		$this->setPhpName('Automailer');
 		$this->setClassname('Automailer');
 		$this->setPackage('plugins.afAutomailerPlugin.lib.model');
@@ -44,6 +44,7 @@ class AutomailerTableMap extends TableMap {
 		$this->addColumn('BODY', 'Body', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('ALT_BODY', 'AltBody', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('SENT_DATE', 'SentDate', 'TIMESTAMP', false, null, null);
+		$this->addColumn('SEND_AT_DATE', 'SendAtDate', 'TIMESTAMP', true, null, null);
 		$this->addColumn('IS_SENT', 'IsSent', 'TINYINT', true, null, 0);
 		$this->addColumn('IS_HTML', 'IsHtml', 'TINYINT', true, null, 0);
 		$this->addColumn('IS_FAILED', 'IsFailed', 'TINYINT', true, null, 0);
@@ -56,19 +57,5 @@ class AutomailerTableMap extends TableMap {
 	public function buildRelations()
 	{
 	} // buildRelations()
-
-	/**
-	 * 
-	 * Gets the list of behaviors registered for this table
-	 * 
-	 * @return array Associative array (name => parameters) of behaviors
-	 */
-	public function getBehaviors()
-	{
-		return array(
-			'symfony' => array('form' => 'true', 'filter' => 'true', ),
-			'symfony_behaviors' => array(),
-		);
-	} // getBehaviors()
 
 } // AutomailerTableMap

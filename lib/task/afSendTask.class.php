@@ -10,7 +10,7 @@ class afSendTask extends sfPropelBaseTask
     // ));
 
     $this->addOptions(array(
-      new sfCommandOption('application', null, sfCommandOption::PARAMETER_REQUIRED, 'frontend'),
+      new sfCommandOption('application', null, sfCommandOption::PARAMETER_OPTIONAL, 'The application name', 'frontend'),
       new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'prod'),
       new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel'),
       // add your own options here
@@ -33,18 +33,23 @@ EOF;
     $databaseManager = new sfDatabaseManager($this->configuration);
     $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
 
-    $automailer_objs = AutomailerPeer::getUnsentEmails();
+    $automailer_objs = AutomailerPeer::getEmailsForSending();
 
+    $counter = 0;
     if(count($automailer_objs)>0)
     {
       foreach ($automailer_objs as $k=>$automailer_obj)
       {
         // only proceed if and only if there is a source and a destination
         if ($automailer_obj->getFromEmail() != '' && $automailer_obj->getToEmail() != '') {
-          afAutomailer::sendMail($automailer_obj);
+          if (afAutomailer::sendMail($automailer_obj)) {
+            $counter++;
+          }
         }
       }
     }
-    
+
+    $this->log("Nr of emails send: $counter");
+    return 0;
   }
 }

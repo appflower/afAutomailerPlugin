@@ -1,16 +1,23 @@
 <?php
 class afAutomailer {
 
-        public static function saveMail($mailModule, $mailTemplate, $parameters)
+        public static function saveMail($mailModule, $mailTemplate, $parameters, $sendAt = null)
 	{
             $mail = new Automailer();
             $mail->setToEmail($parameters['email']);
-            $mail->setFromEmail('no-reply@'.sfConfig::get('app_domain'));
+            $appConf = sfApplicationConfiguration::getActive();
+            if (method_exists($appConf, 'configGet')) {
+                $appDomain = $appConf->configGet('app_domain');
+            } else {
+                $appDomain = sfConfig::get('app_domain');
+            }
+            $mail->setFromEmail("no-reply@$appDomain");
             $mail->setFromName($parameters['from']);
             $mail->setSubject($parameters['subject']);
             $mail->setIsHtml(1);
             $mail->setSentDate(time());
             $mail->setContent($mailModule, $mailTemplate, $parameters);
+            $mail->setSendAtDate($sendAt);
             $mail->save();
 	}
 

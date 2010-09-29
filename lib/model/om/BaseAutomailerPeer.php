@@ -9,11 +9,14 @@
  */
 abstract class BaseAutomailerPeer {
 
+	/** class enabled with symfony I18N functionality */
+	const IS_I18N = false;
+
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'automailer';
+	const TABLE_NAME = 'af_automailer';
 
 	/** the related Propel class for this table */
 	const OM_CLASS = 'Automailer';
@@ -25,43 +28,46 @@ abstract class BaseAutomailerPeer {
 	const TM_CLASS = 'AutomailerTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 12;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'automailer.ID';
+	const ID = 'af_automailer.ID';
 
 	/** the column name for the FROM_EMAIL field */
-	const FROM_EMAIL = 'automailer.FROM_EMAIL';
+	const FROM_EMAIL = 'af_automailer.FROM_EMAIL';
 
 	/** the column name for the FROM_NAME field */
-	const FROM_NAME = 'automailer.FROM_NAME';
+	const FROM_NAME = 'af_automailer.FROM_NAME';
 
 	/** the column name for the TO_EMAIL field */
-	const TO_EMAIL = 'automailer.TO_EMAIL';
+	const TO_EMAIL = 'af_automailer.TO_EMAIL';
 
 	/** the column name for the SUBJECT field */
-	const SUBJECT = 'automailer.SUBJECT';
+	const SUBJECT = 'af_automailer.SUBJECT';
 
 	/** the column name for the BODY field */
-	const BODY = 'automailer.BODY';
+	const BODY = 'af_automailer.BODY';
 
 	/** the column name for the ALT_BODY field */
-	const ALT_BODY = 'automailer.ALT_BODY';
+	const ALT_BODY = 'af_automailer.ALT_BODY';
 
 	/** the column name for the SENT_DATE field */
-	const SENT_DATE = 'automailer.SENT_DATE';
+	const SENT_DATE = 'af_automailer.SENT_DATE';
+
+	/** the column name for the SEND_AT_DATE field */
+	const SEND_AT_DATE = 'af_automailer.SEND_AT_DATE';
 
 	/** the column name for the IS_SENT field */
-	const IS_SENT = 'automailer.IS_SENT';
+	const IS_SENT = 'af_automailer.IS_SENT';
 
 	/** the column name for the IS_HTML field */
-	const IS_HTML = 'automailer.IS_HTML';
+	const IS_HTML = 'af_automailer.IS_HTML';
 
 	/** the column name for the IS_FAILED field */
-	const IS_FAILED = 'automailer.IS_FAILED';
+	const IS_FAILED = 'af_automailer.IS_FAILED';
 
 	/**
 	 * An identiy map to hold any loaded instances of Automailer objects.
@@ -72,13 +78,6 @@ abstract class BaseAutomailerPeer {
 	public static $instances = array();
 
 
-	// symfony behavior
-	
-	/**
-	 * Indicates whether the current model includes I18N.
-	 */
-	const IS_I18N = false;
-
 	/**
 	 * holds an array of fieldnames
 	 *
@@ -86,11 +85,11 @@ abstract class BaseAutomailerPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'FromEmail', 'FromName', 'ToEmail', 'Subject', 'Body', 'AltBody', 'SentDate', 'IsSent', 'IsHtml', 'IsFailed', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'fromEmail', 'fromName', 'toEmail', 'subject', 'body', 'altBody', 'sentDate', 'isSent', 'isHtml', 'isFailed', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::FROM_EMAIL, self::FROM_NAME, self::TO_EMAIL, self::SUBJECT, self::BODY, self::ALT_BODY, self::SENT_DATE, self::IS_SENT, self::IS_HTML, self::IS_FAILED, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'from_email', 'from_name', 'to_email', 'subject', 'body', 'alt_body', 'sent_date', 'is_sent', 'is_html', 'is_failed', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'FromEmail', 'FromName', 'ToEmail', 'Subject', 'Body', 'AltBody', 'SentDate', 'SendAtDate', 'IsSent', 'IsHtml', 'IsFailed', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'fromEmail', 'fromName', 'toEmail', 'subject', 'body', 'altBody', 'sentDate', 'sendAtDate', 'isSent', 'isHtml', 'isFailed', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::FROM_EMAIL, self::FROM_NAME, self::TO_EMAIL, self::SUBJECT, self::BODY, self::ALT_BODY, self::SENT_DATE, self::SEND_AT_DATE, self::IS_SENT, self::IS_HTML, self::IS_FAILED, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'from_email', 'from_name', 'to_email', 'subject', 'body', 'alt_body', 'sent_date', 'send_at_date', 'is_sent', 'is_html', 'is_failed', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -100,11 +99,11 @@ abstract class BaseAutomailerPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FromEmail' => 1, 'FromName' => 2, 'ToEmail' => 3, 'Subject' => 4, 'Body' => 5, 'AltBody' => 6, 'SentDate' => 7, 'IsSent' => 8, 'IsHtml' => 9, 'IsFailed' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'fromEmail' => 1, 'fromName' => 2, 'toEmail' => 3, 'subject' => 4, 'body' => 5, 'altBody' => 6, 'sentDate' => 7, 'isSent' => 8, 'isHtml' => 9, 'isFailed' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FROM_EMAIL => 1, self::FROM_NAME => 2, self::TO_EMAIL => 3, self::SUBJECT => 4, self::BODY => 5, self::ALT_BODY => 6, self::SENT_DATE => 7, self::IS_SENT => 8, self::IS_HTML => 9, self::IS_FAILED => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'from_email' => 1, 'from_name' => 2, 'to_email' => 3, 'subject' => 4, 'body' => 5, 'alt_body' => 6, 'sent_date' => 7, 'is_sent' => 8, 'is_html' => 9, 'is_failed' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FromEmail' => 1, 'FromName' => 2, 'ToEmail' => 3, 'Subject' => 4, 'Body' => 5, 'AltBody' => 6, 'SentDate' => 7, 'SendAtDate' => 8, 'IsSent' => 9, 'IsHtml' => 10, 'IsFailed' => 11, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'fromEmail' => 1, 'fromName' => 2, 'toEmail' => 3, 'subject' => 4, 'body' => 5, 'altBody' => 6, 'sentDate' => 7, 'sendAtDate' => 8, 'isSent' => 9, 'isHtml' => 10, 'isFailed' => 11, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FROM_EMAIL => 1, self::FROM_NAME => 2, self::TO_EMAIL => 3, self::SUBJECT => 4, self::BODY => 5, self::ALT_BODY => 6, self::SENT_DATE => 7, self::SEND_AT_DATE => 8, self::IS_SENT => 9, self::IS_HTML => 10, self::IS_FAILED => 11, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'from_email' => 1, 'from_name' => 2, 'to_email' => 3, 'subject' => 4, 'body' => 5, 'alt_body' => 6, 'sent_date' => 7, 'send_at_date' => 8, 'is_sent' => 9, 'is_html' => 10, 'is_failed' => 11, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -182,6 +181,7 @@ abstract class BaseAutomailerPeer {
 		$criteria->addSelectColumn(AutomailerPeer::BODY);
 		$criteria->addSelectColumn(AutomailerPeer::ALT_BODY);
 		$criteria->addSelectColumn(AutomailerPeer::SENT_DATE);
+		$criteria->addSelectColumn(AutomailerPeer::SEND_AT_DATE);
 		$criteria->addSelectColumn(AutomailerPeer::IS_SENT);
 		$criteria->addSelectColumn(AutomailerPeer::IS_HTML);
 		$criteria->addSelectColumn(AutomailerPeer::IS_FAILED);
@@ -219,11 +219,13 @@ abstract class BaseAutomailerPeer {
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
-		// symfony_behaviors behavior
-		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
-		{
-		  call_user_func($sf_hook, 'BaseAutomailerPeer', $criteria, $con);
-		}
+
+
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doCount:doCount') as $callable)
+    {
+      call_user_func($callable, 'BaseAutomailerPeer', $criteria, $con);
+    }
+
 
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -283,6 +285,13 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
+
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doSelectStmt:doSelectStmt') as $callable)
+    {
+      call_user_func($callable, 'BaseAutomailerPeer', $criteria, $con);
+    }
+
+
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
@@ -294,12 +303,6 @@ abstract class BaseAutomailerPeer {
 
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-		// symfony_behaviors behavior
-		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
-		{
-		  call_user_func($sf_hook, 'BaseAutomailerPeer', $criteria, $con);
-		}
-
 
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -384,7 +387,7 @@ abstract class BaseAutomailerPeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to automailer
+	 * Method to invalidate the instance pool of all tables related to af_automailer
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -441,6 +444,11 @@ abstract class BaseAutomailerPeer {
 		$stmt->closeCursor();
 		return $results;
 	}
+
+  static public function getUniqueColumnNames()
+  {
+    return array();
+  }
 	/**
 	 * Returns the TableMap related to this peer.
 	 * This method is not needed for general use but a specific application could have a need.
@@ -492,14 +500,16 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doInsert($values, PropelPDO $con = null)
 	{
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:pre') as $sf_hook)
+
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:pre') as $callable)
     {
-      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con))
+      $ret = call_user_func($callable, 'BaseAutomailerPeer', $values, $con);
+      if (false !== $ret)
       {
-        return $sf_hook_retval;
+        return $ret;
       }
     }
+
 
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -530,13 +540,13 @@ abstract class BaseAutomailerPeer {
 			throw $e;
 		}
 
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:post') as $sf_hook)
+		
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:post') as $callable)
     {
-      call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con, $pk);
+      call_user_func($callable, 'BaseAutomailerPeer', $values, $con, $pk);
     }
 
-		return $pk;
+    return $pk;
 	}
 
 	/**
@@ -550,14 +560,16 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:pre') as $sf_hook)
+
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:pre') as $callable)
     {
-      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con))
+      $ret = call_user_func($callable, 'BaseAutomailerPeer', $values, $con);
+      if (false !== $ret)
       {
-        return $sf_hook_retval;
+        return $ret;
       }
     }
+
 
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -580,18 +592,18 @@ abstract class BaseAutomailerPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		$ret = BasePeer::doUpdate($selectCriteria, $criteria, $con);
+	
 
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:post') as $sf_hook)
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:post') as $callable)
     {
-      call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con, $ret);
+      call_user_func($callable, 'BaseAutomailerPeer', $values, $con, $ret);
     }
 
     return $ret;
-	}
+  }
 
 	/**
-	 * Method to DELETE all rows from the automailer table.
+	 * Method to DELETE all rows from the af_automailer table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
@@ -711,7 +723,14 @@ abstract class BaseAutomailerPeer {
 
 		}
 
-		return BasePeer::doValidate(AutomailerPeer::DATABASE_NAME, AutomailerPeer::TABLE_NAME, $columns);
+		$res =  BasePeer::doValidate(AutomailerPeer::DATABASE_NAME, AutomailerPeer::TABLE_NAME, $columns);
+    if ($res !== true) {
+        foreach ($res as $failed) {
+            $col = AutomailerPeer::translateFieldname($failed->getColumn(), BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME);
+        }
+    }
+
+    return $res;
 	}
 
 	/**
@@ -763,39 +782,6 @@ abstract class BaseAutomailerPeer {
 			$objs = AutomailerPeer::doSelect($criteria, $con);
 		}
 		return $objs;
-	}
-
-	// symfony behavior
-	
-	/**
-	 * Returns an array of arrays that contain columns in each unique index.
-	 *
-	 * @return array
-	 */
-	static public function getUniqueColumnNames()
-	{
-	  return array();
-	}
-
-	// symfony_behaviors behavior
-	
-	/**
-	 * Returns the name of the hook to call from inside the supplied method.
-	 *
-	 * @param string $method The calling method
-	 *
-	 * @return string A hook name for {@link sfMixer}
-	 *
-	 * @throws LogicException If the method name is not recognized
-	 */
-	static private function getMixerPreSelectHook($method)
-	{
-	  if (preg_match('/^do(Select|Count)(Join(All(Except)?)?|Stmt)?/', $method, $match))
-	  {
-	    return sprintf('BaseAutomailerPeer:%s:%1$s', 'Count' == $match[1] ? 'doCount' : $match[0]);
-	  }
-	
-	  throw new LogicException(sprintf('Unrecognized function "%s"', $method));
 	}
 
 } // BaseAutomailerPeer
