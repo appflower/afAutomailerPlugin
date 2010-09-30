@@ -10,8 +10,6 @@
 abstract class BaseAutomailer extends BaseObject  implements Persistent {
 
 
-  const PEER = 'AutomailerPeer';
-
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class
@@ -108,6 +106,10 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 * @var        boolean
 	 */
 	protected $alreadyInValidation = false;
+
+	// symfony behavior
+	
+	const PEER = 'AutomailerPeer';
 
 	/**
 	 * Applies default values to this object.
@@ -747,17 +749,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 */
 	public function delete(PropelPDO $con = null)
 	{
-
-    foreach (sfMixer::getCallables('BaseAutomailer:delete:pre') as $callable)
-    {
-      $ret = call_user_func($callable, $this, $con);
-      if ($ret)
-      {
-        return;
-      }
-    }
-
-
 		if ($this->isDeleted()) {
 			throw new PropelException("This object has already been deleted.");
 		}
@@ -769,9 +760,26 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
+			// symfony_behaviors behavior
+			foreach (sfMixer::getCallables('BaseAutomailer:delete:pre') as $callable)
+			{
+			  if (call_user_func($callable, $this, $con))
+			  {
+			    $con->commit();
+			
+			    return;
+			  }
+			}
+
 			if ($ret) {
 				AutomailerPeer::doDelete($this, $con);
 				$this->postDelete($con);
+				// symfony_behaviors behavior
+				foreach (sfMixer::getCallables('BaseAutomailer:delete:post') as $callable)
+				{
+				  call_user_func($callable, $this, $con);
+				}
+
 				$this->setDeleted(true);
 				$con->commit();
 			} else {
@@ -781,14 +789,8 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			$con->rollBack();
 			throw $e;
 		}
-	
+	}
 
-    foreach (sfMixer::getCallables('BaseAutomailer:delete:post') as $callable)
-    {
-      call_user_func($callable, $this, $con);
-    }
-
-  }
 	/**
 	 * Persists this object to the database.
 	 *
@@ -804,17 +806,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 */
 	public function save(PropelPDO $con = null)
 	{
-
-    foreach (sfMixer::getCallables('BaseAutomailer:save:pre') as $callable)
-    {
-      $affectedRows = call_user_func($callable, $this, $con);
-      if (is_int($affectedRows))
-      {
-        return $affectedRows;
-      }
-    }
-
-
 		if ($this->isDeleted()) {
 			throw new PropelException("You cannot save an object that has been deleted.");
 		}
@@ -827,6 +818,17 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		$isInsert = $this->isNew();
 		try {
 			$ret = $this->preSave($con);
+			// symfony_behaviors behavior
+			foreach (sfMixer::getCallables('BaseAutomailer:save:pre') as $callable)
+			{
+			  if (is_integer($affectedRows = call_user_func($callable, $this, $con)))
+			  {
+			    $con->commit();
+			
+			    return $affectedRows;
+			  }
+			}
+
 			if ($isInsert) {
 				$ret = $ret && $this->preInsert($con);
 			} else {
@@ -840,16 +842,17 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 					$this->postUpdate($con);
 				}
 				$this->postSave($con);
+				// symfony_behaviors behavior
+				foreach (sfMixer::getCallables('BaseAutomailer:save:post') as $callable)
+				{
+				  call_user_func($callable, $this, $con, $affectedRows);
+				}
+
 				AutomailerPeer::addInstanceToPool($this);
 			} else {
 				$affectedRows = 0;
 			}
 			$con->commit();
-    foreach (sfMixer::getCallables('BaseAutomailer:save:post') as $callable)
-    {
-      call_user_func($callable, $this, $con, $affectedRows);
-    }
-
 			return $affectedRows;
 		} catch (PropelException $e) {
 			$con->rollBack();
@@ -1332,16 +1335,21 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 
 	}
 
-  public function __call($method, $arguments)
-  {
-    if (!$callable = sfMixer::getCallable('BaseAutomailer:'.$method))
-    {
-      throw new sfException(sprintf('Call to undefined method BaseAutomailer::%s', $method));
-    }
-
-    array_unshift($arguments, $this);
-
-    return call_user_func_array($callable, $arguments);
-  }
+	// symfony_behaviors behavior
+	
+	/**
+	 * Calls methods defined via {@link sfMixer}.
+	 */
+	public function __call($method, $arguments)
+	{
+	  if (!$callable = sfMixer::getCallable('BaseAutomailer:'.$method))
+	  {
+	    throw new sfException(sprintf('Call to undefined method BaseAutomailer::%s', $method));
+	  }
+	
+	  array_unshift($arguments, $this);
+	
+	  return call_user_func_array($callable, $arguments);
+	}
 
 } // BaseAutomailer

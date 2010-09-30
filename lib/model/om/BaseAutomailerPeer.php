@@ -9,9 +9,6 @@
  */
 abstract class BaseAutomailerPeer {
 
-	/** class enabled with symfony I18N functionality */
-	const IS_I18N = false;
-
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
@@ -77,6 +74,13 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static $instances = array();
 
+
+	// symfony behavior
+	
+	/**
+	 * Indicates whether the current model includes I18N.
+	 */
+	const IS_I18N = false;
 
 	/**
 	 * holds an array of fieldnames
@@ -219,13 +223,11 @@ abstract class BaseAutomailerPeer {
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
-
-
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doCount:doCount') as $callable)
-    {
-      call_user_func($callable, 'BaseAutomailerPeer', $criteria, $con);
-    }
-
+		// symfony_behaviors behavior
+		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
+		{
+		  call_user_func($sf_hook, 'BaseAutomailerPeer', $criteria, $con);
+		}
 
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -285,13 +287,6 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doSelectStmt:doSelectStmt') as $callable)
-    {
-      call_user_func($callable, 'BaseAutomailerPeer', $criteria, $con);
-    }
-
-
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		}
@@ -303,6 +298,12 @@ abstract class BaseAutomailerPeer {
 
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
+		// symfony_behaviors behavior
+		foreach (sfMixer::getCallables(self::getMixerPreSelectHook(__FUNCTION__)) as $sf_hook)
+		{
+		  call_user_func($sf_hook, 'BaseAutomailerPeer', $criteria, $con);
+		}
+
 
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -444,11 +445,6 @@ abstract class BaseAutomailerPeer {
 		$stmt->closeCursor();
 		return $results;
 	}
-
-  static public function getUniqueColumnNames()
-  {
-    return array();
-  }
 	/**
 	 * Returns the TableMap related to this peer.
 	 * This method is not needed for general use but a specific application could have a need.
@@ -500,16 +496,14 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doInsert($values, PropelPDO $con = null)
 	{
-
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:pre') as $callable)
+    // symfony_behaviors behavior
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:pre') as $sf_hook)
     {
-      $ret = call_user_func($callable, 'BaseAutomailerPeer', $values, $con);
-      if (false !== $ret)
+      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con))
       {
-        return $ret;
+        return $sf_hook_retval;
       }
     }
-
 
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -540,13 +534,13 @@ abstract class BaseAutomailerPeer {
 			throw $e;
 		}
 
-		
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:post') as $callable)
+    // symfony_behaviors behavior
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:post') as $sf_hook)
     {
-      call_user_func($callable, 'BaseAutomailerPeer', $values, $con, $pk);
+      call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con, $pk);
     }
 
-    return $pk;
+		return $pk;
 	}
 
 	/**
@@ -560,16 +554,14 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
-
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:pre') as $callable)
+    // symfony_behaviors behavior
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:pre') as $sf_hook)
     {
-      $ret = call_user_func($callable, 'BaseAutomailerPeer', $values, $con);
-      if (false !== $ret)
+      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con))
       {
-        return $ret;
+        return $sf_hook_retval;
       }
     }
-
 
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -592,15 +584,15 @@ abstract class BaseAutomailerPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		$ret = BasePeer::doUpdate($selectCriteria, $criteria, $con);
-	
 
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:post') as $callable)
+    // symfony_behaviors behavior
+    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:post') as $sf_hook)
     {
-      call_user_func($callable, 'BaseAutomailerPeer', $values, $con, $ret);
+      call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con, $ret);
     }
 
     return $ret;
-  }
+	}
 
 	/**
 	 * Method to DELETE all rows from the af_automailer table.
@@ -723,14 +715,7 @@ abstract class BaseAutomailerPeer {
 
 		}
 
-		$res =  BasePeer::doValidate(AutomailerPeer::DATABASE_NAME, AutomailerPeer::TABLE_NAME, $columns);
-    if ($res !== true) {
-        foreach ($res as $failed) {
-            $col = AutomailerPeer::translateFieldname($failed->getColumn(), BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME);
-        }
-    }
-
-    return $res;
+		return BasePeer::doValidate(AutomailerPeer::DATABASE_NAME, AutomailerPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -782,6 +767,39 @@ abstract class BaseAutomailerPeer {
 			$objs = AutomailerPeer::doSelect($criteria, $con);
 		}
 		return $objs;
+	}
+
+	// symfony behavior
+	
+	/**
+	 * Returns an array of arrays that contain columns in each unique index.
+	 *
+	 * @return array
+	 */
+	static public function getUniqueColumnNames()
+	{
+	  return array();
+	}
+
+	// symfony_behaviors behavior
+	
+	/**
+	 * Returns the name of the hook to call from inside the supplied method.
+	 *
+	 * @param string $method The calling method
+	 *
+	 * @return string A hook name for {@link sfMixer}
+	 *
+	 * @throws LogicException If the method name is not recognized
+	 */
+	static private function getMixerPreSelectHook($method)
+	{
+	  if (preg_match('/^do(Select|Count)(Join(All(Except)?)?|Stmt)?/', $method, $match))
+	  {
+	    return sprintf('BaseAutomailerPeer:%s:%1$s', 'Count' == $match[1] ? 'doCount' : $match[0]);
+	  }
+	
+	  throw new LogicException(sprintf('Unrecognized function "%s"', $method));
 	}
 
 } // BaseAutomailerPeer
