@@ -1,11 +1,12 @@
 <?php
 
+
 /**
  * Base static class for performing query and update operations on the 'af_automailer' table.
  *
  * 
  *
- * @package    plugins.afAutomailerPlugin.lib.model.om
+ * @package    propel.generator.plugins.afAutomailerPlugin.lib.model.om
  */
 abstract class BaseAutomailerPeer {
 
@@ -92,6 +93,7 @@ abstract class BaseAutomailerPeer {
 		BasePeer::TYPE_PHPNAME => array ('Id', 'FromEmail', 'FromName', 'ToEmail', 'Subject', 'Body', 'AltBody', 'SentDate', 'SendAtDate', 'IsSent', 'IsHtml', 'IsFailed', ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'fromEmail', 'fromName', 'toEmail', 'subject', 'body', 'altBody', 'sentDate', 'sendAtDate', 'isSent', 'isHtml', 'isFailed', ),
 		BasePeer::TYPE_COLNAME => array (self::ID, self::FROM_EMAIL, self::FROM_NAME, self::TO_EMAIL, self::SUBJECT, self::BODY, self::ALT_BODY, self::SENT_DATE, self::SEND_AT_DATE, self::IS_SENT, self::IS_HTML, self::IS_FAILED, ),
+		BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FROM_EMAIL', 'FROM_NAME', 'TO_EMAIL', 'SUBJECT', 'BODY', 'ALT_BODY', 'SENT_DATE', 'SEND_AT_DATE', 'IS_SENT', 'IS_HTML', 'IS_FAILED', ),
 		BasePeer::TYPE_FIELDNAME => array ('id', 'from_email', 'from_name', 'to_email', 'subject', 'body', 'alt_body', 'sent_date', 'send_at_date', 'is_sent', 'is_html', 'is_failed', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
@@ -106,6 +108,7 @@ abstract class BaseAutomailerPeer {
 		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FromEmail' => 1, 'FromName' => 2, 'ToEmail' => 3, 'Subject' => 4, 'Body' => 5, 'AltBody' => 6, 'SentDate' => 7, 'SendAtDate' => 8, 'IsSent' => 9, 'IsHtml' => 10, 'IsFailed' => 11, ),
 		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'fromEmail' => 1, 'fromName' => 2, 'toEmail' => 3, 'subject' => 4, 'body' => 5, 'altBody' => 6, 'sentDate' => 7, 'sendAtDate' => 8, 'isSent' => 9, 'isHtml' => 10, 'isFailed' => 11, ),
 		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FROM_EMAIL => 1, self::FROM_NAME => 2, self::TO_EMAIL => 3, self::SUBJECT => 4, self::BODY => 5, self::ALT_BODY => 6, self::SENT_DATE => 7, self::SEND_AT_DATE => 8, self::IS_SENT => 9, self::IS_HTML => 10, self::IS_FAILED => 11, ),
+		BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FROM_EMAIL' => 1, 'FROM_NAME' => 2, 'TO_EMAIL' => 3, 'SUBJECT' => 4, 'BODY' => 5, 'ALT_BODY' => 6, 'SENT_DATE' => 7, 'SEND_AT_DATE' => 8, 'IS_SENT' => 9, 'IS_HTML' => 10, 'IS_FAILED' => 11, ),
 		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'from_email' => 1, 'from_name' => 2, 'to_email' => 3, 'subject' => 4, 'body' => 5, 'alt_body' => 6, 'sent_date' => 7, 'send_at_date' => 8, 'is_sent' => 9, 'is_html' => 10, 'is_failed' => 11, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
@@ -171,24 +174,40 @@ abstract class BaseAutomailerPeer {
 	 * XML schema will not be added to the select list and only loaded
 	 * on demand.
 	 *
-	 * @param      criteria object containing the columns to add.
+	 * @param      Criteria $criteria object containing the columns to add.
+	 * @param      string   $alias    optional table alias
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function addSelectColumns(Criteria $criteria)
+	public static function addSelectColumns(Criteria $criteria, $alias = null)
 	{
-		$criteria->addSelectColumn(AutomailerPeer::ID);
-		$criteria->addSelectColumn(AutomailerPeer::FROM_EMAIL);
-		$criteria->addSelectColumn(AutomailerPeer::FROM_NAME);
-		$criteria->addSelectColumn(AutomailerPeer::TO_EMAIL);
-		$criteria->addSelectColumn(AutomailerPeer::SUBJECT);
-		$criteria->addSelectColumn(AutomailerPeer::BODY);
-		$criteria->addSelectColumn(AutomailerPeer::ALT_BODY);
-		$criteria->addSelectColumn(AutomailerPeer::SENT_DATE);
-		$criteria->addSelectColumn(AutomailerPeer::SEND_AT_DATE);
-		$criteria->addSelectColumn(AutomailerPeer::IS_SENT);
-		$criteria->addSelectColumn(AutomailerPeer::IS_HTML);
-		$criteria->addSelectColumn(AutomailerPeer::IS_FAILED);
+		if (null === $alias) {
+			$criteria->addSelectColumn(AutomailerPeer::ID);
+			$criteria->addSelectColumn(AutomailerPeer::FROM_EMAIL);
+			$criteria->addSelectColumn(AutomailerPeer::FROM_NAME);
+			$criteria->addSelectColumn(AutomailerPeer::TO_EMAIL);
+			$criteria->addSelectColumn(AutomailerPeer::SUBJECT);
+			$criteria->addSelectColumn(AutomailerPeer::BODY);
+			$criteria->addSelectColumn(AutomailerPeer::ALT_BODY);
+			$criteria->addSelectColumn(AutomailerPeer::SENT_DATE);
+			$criteria->addSelectColumn(AutomailerPeer::SEND_AT_DATE);
+			$criteria->addSelectColumn(AutomailerPeer::IS_SENT);
+			$criteria->addSelectColumn(AutomailerPeer::IS_HTML);
+			$criteria->addSelectColumn(AutomailerPeer::IS_FAILED);
+		} else {
+			$criteria->addSelectColumn($alias . '.ID');
+			$criteria->addSelectColumn($alias . '.FROM_EMAIL');
+			$criteria->addSelectColumn($alias . '.FROM_NAME');
+			$criteria->addSelectColumn($alias . '.TO_EMAIL');
+			$criteria->addSelectColumn($alias . '.SUBJECT');
+			$criteria->addSelectColumn($alias . '.BODY');
+			$criteria->addSelectColumn($alias . '.ALT_BODY');
+			$criteria->addSelectColumn($alias . '.SENT_DATE');
+			$criteria->addSelectColumn($alias . '.SEND_AT_DATE');
+			$criteria->addSelectColumn($alias . '.IS_SENT');
+			$criteria->addSelectColumn($alias . '.IS_HTML');
+			$criteria->addSelectColumn($alias . '.IS_FAILED');
+		}
 	}
 
 	/**
@@ -415,6 +434,20 @@ abstract class BaseAutomailerPeer {
 	}
 
 	/**
+	 * Retrieves the primary key from the DB resultset row 
+	 * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
+	 * a multi-column primary key, an array of the primary key columns will be returned.
+	 *
+	 * @param      array $row PropelPDO resultset row.
+	 * @param      int $startcol The 0-based offset for reading from the resultset row.
+	 * @return     mixed The primary key of the row
+	 */
+	public static function getPrimaryKeyFromRow($row, $startcol = 0)
+	{
+		return (int) $row[$startcol];
+	}
+	
+	/**
 	 * The returned array will contain objects of the default type or
 	 * objects that inherit from the default.
 	 *
@@ -432,7 +465,7 @@ abstract class BaseAutomailerPeer {
 			$key = AutomailerPeer::getPrimaryKeyHashFromRow($row, 0);
 			if (null !== ($obj = AutomailerPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
+				// See http://www.propelorm.org/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
@@ -444,6 +477,31 @@ abstract class BaseAutomailerPeer {
 		}
 		$stmt->closeCursor();
 		return $results;
+	}
+	/**
+	 * Populates an object of the default type or an object that inherit from the default.
+	 *
+	 * @param      array $row PropelPDO resultset row.
+	 * @param      int $startcol The 0-based offset for reading from the resultset row.
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 * @return     array (Automailer object, last column rank)
+	 */
+	public static function populateObject($row, $startcol = 0)
+	{
+		$key = AutomailerPeer::getPrimaryKeyHashFromRow($row, $startcol);
+		if (null !== ($obj = AutomailerPeer::getInstanceFromPool($key))) {
+			// We no longer rehydrate the object, since this can cause data loss.
+			// See http://www.propelorm.org/ticket/509
+			// $obj->hydrate($row, $startcol, true); // rehydrate
+			$col = $startcol + AutomailerPeer::NUM_COLUMNS;
+		} else {
+			$cls = AutomailerPeer::OM_CLASS;
+			$obj = new $cls();
+			$col = $obj->hydrate($row, $startcol);
+			AutomailerPeer::addInstanceToPool($obj, $key);
+		}
+		return array($obj, $col);
 	}
 	/**
 	 * Returns the TableMap related to this peer.
@@ -477,7 +535,7 @@ abstract class BaseAutomailerPeer {
 	 * relative to a location on the PHP include_path.
 	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
 	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @param      boolean $withPrefix Whether or not to return the path with the class name
 	 * @return     string path.to.ClassName
 	 */
 	public static function getOMClass($withPrefix = true)
@@ -496,15 +554,6 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doInsert($values, PropelPDO $con = null)
 	{
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:pre') as $sf_hook)
-    {
-      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con))
-      {
-        return $sf_hook_retval;
-      }
-    }
-
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
@@ -534,12 +583,6 @@ abstract class BaseAutomailerPeer {
 			throw $e;
 		}
 
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doInsert:post') as $sf_hook)
-    {
-      call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con, $pk);
-    }
-
 		return $pk;
 	}
 
@@ -554,15 +597,6 @@ abstract class BaseAutomailerPeer {
 	 */
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:pre') as $sf_hook)
-    {
-      if (false !== $sf_hook_retval = call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con))
-      {
-        return $sf_hook_retval;
-      }
-    }
-
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
@@ -573,7 +607,12 @@ abstract class BaseAutomailerPeer {
 			$criteria = clone $values; // rename for clarity
 
 			$comparison = $criteria->getComparison(AutomailerPeer::ID);
-			$selectCriteria->add(AutomailerPeer::ID, $criteria->remove(AutomailerPeer::ID), $comparison);
+			$value = $criteria->remove(AutomailerPeer::ID);
+			if ($value) {
+				$selectCriteria->add(AutomailerPeer::ID, $value, $comparison);
+			} else {
+				$selectCriteria->setPrimaryTableName(AutomailerPeer::TABLE_NAME);
+			}
 
 		} else { // $values is Automailer object
 			$criteria = $values->buildCriteria(); // gets full criteria
@@ -583,15 +622,7 @@ abstract class BaseAutomailerPeer {
 		// set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
-		$ret = BasePeer::doUpdate($selectCriteria, $criteria, $con);
-
-    // symfony_behaviors behavior
-    foreach (sfMixer::getCallables('BaseAutomailerPeer:doUpdate:post') as $sf_hook)
-    {
-      call_user_func($sf_hook, 'BaseAutomailerPeer', $values, $con, $ret);
-    }
-
-    return $ret;
+		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
 	}
 
 	/**
@@ -609,7 +640,7 @@ abstract class BaseAutomailerPeer {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(AutomailerPeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(AutomailerPeer::TABLE_NAME, $con, AutomailerPeer::DATABASE_NAME);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).

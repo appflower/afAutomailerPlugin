@@ -1,14 +1,20 @@
 <?php
 
+
 /**
  * Base class that represents a row from the 'af_automailer' table.
  *
  * 
  *
- * @package    plugins.afAutomailerPlugin.lib.model.om
+ * @package    propel.generator.plugins.afAutomailerPlugin.lib.model.om
  */
-abstract class BaseAutomailer extends BaseObject  implements Persistent {
+abstract class BaseAutomailer extends BaseObject  implements Persistent
+{
 
+	/**
+	 * Peer class name
+	 */
+	const PEER = 'AutomailerPeer';
 
 	/**
 	 * The Peer class.
@@ -106,10 +112,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 * @var        boolean
 	 */
 	protected $alreadyInValidation = false;
-
-	// symfony behavior
-	
-	const PEER = 'AutomailerPeer';
 
 	/**
 	 * Applies default values to this object.
@@ -672,7 +674,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 				$this->ensureConsistency();
 			}
 
-			// FIXME - using NUM_COLUMNS may be clearer.
 			return $startcol + 12; // 12 = AutomailerPeer::NUM_COLUMNS - AutomailerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
@@ -734,7 +735,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		$this->hydrate($row, 0, true); // rehydrate
 
 		if ($deep) {  // also de-associate any related objects?
-
 		} // if (deep)
 	}
 
@@ -756,7 +756,7 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -766,13 +766,14 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			  if (call_user_func($callable, $this, $con))
 			  {
 			    $con->commit();
-			
 			    return;
 			  }
 			}
 
 			if ($ret) {
-				AutomailerPeer::doDelete($this, $con);
+				AutomailerQuery::create()
+					->filterByPrimaryKey($this->getPrimaryKey())
+					->delete($con);
 				$this->postDelete($con);
 				// symfony_behaviors behavior
 				foreach (sfMixer::getCallables('BaseAutomailer:delete:post') as $callable)
@@ -780,8 +781,8 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 				  call_user_func($callable, $this, $con);
 				}
 
-				$this->setDeleted(true);
 				$con->commit();
+				$this->setDeleted(true);
 			} else {
 				$con->commit();
 			}
@@ -813,7 +814,7 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 		if ($con === null) {
 			$con = Propel::getConnection(AutomailerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -823,8 +824,7 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			{
 			  if (is_integer($affectedRows = call_user_func($callable, $this, $con)))
 			  {
-			    $con->commit();
-			
+			  	$con->commit();
 			    return $affectedRows;
 			  }
 			}
@@ -884,16 +884,17 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 			// If this object has been modified, then save it to the database.
 			if ($this->isModified()) {
 				if ($this->isNew()) {
-					$pk = AutomailerPeer::doInsert($this, $con);
-					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
-										 // should always be true here (even though technically
-										 // BasePeer::doInsert() can insert multiple rows).
+					$criteria = $this->buildCriteria();
+					if ($criteria->keyContainsValue(AutomailerPeer::ID) ) {
+						throw new PropelException('Cannot insert a value for auto-increment primary key ('.AutomailerPeer::ID.')');
+					}
 
+					$pk = BasePeer::doInsert($criteria, $con);
+					$affectedRows = 1;
 					$this->setId($pk);  //[IMV] update autoincrement primary key
-
 					$this->setNew(false);
 				} else {
-					$affectedRows += AutomailerPeer::doUpdate($this, $con);
+					$affectedRows = AutomailerPeer::doUpdate($this, $con);
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -1051,10 +1052,12 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 * You can specify the key type of the array by passing one of the class
 	 * type constants.
 	 *
-	 * @param      string $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME
-	 *                        BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. Defaults to BasePeer::TYPE_PHPNAME.
-	 * @param      boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns.  Defaults to TRUE.
-	 * @return     an associative array containing the field names (as keys) and field values
+	 * @param     string  $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
+	 *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
+	 *                    Defaults to BasePeer::TYPE_PHPNAME.
+	 * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+	 *
+	 * @return    array an associative array containing the field names (as keys) and field values
 	 */
 	public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true)
 	{
@@ -1213,7 +1216,6 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	public function buildPkeyCriteria()
 	{
 		$criteria = new Criteria(AutomailerPeer::DATABASE_NAME);
-
 		$criteria->add(AutomailerPeer::ID, $this->id);
 
 		return $criteria;
@@ -1240,6 +1242,15 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Returns true if the primary key for this object is null.
+	 * @return     boolean
+	 */
+	public function isPrimaryKeyNull()
+	{
+		return null === $this->getId();
+	}
+
+	/**
 	 * Sets contents of passed object to values from current object.
 	 *
 	 * If desired, this method can also make copies of all associated (fkey referrers)
@@ -1251,34 +1262,20 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
-
 		$copyObj->setFromEmail($this->from_email);
-
 		$copyObj->setFromName($this->from_name);
-
 		$copyObj->setToEmail($this->to_email);
-
 		$copyObj->setSubject($this->subject);
-
 		$copyObj->setBody($this->body);
-
 		$copyObj->setAltBody($this->alt_body);
-
 		$copyObj->setSentDate($this->sent_date);
-
 		$copyObj->setSendAtDate($this->send_at_date);
-
 		$copyObj->setIsSent($this->is_sent);
-
 		$copyObj->setIsHtml($this->is_html);
-
 		$copyObj->setIsFailed($this->is_failed);
 
-
 		$copyObj->setNew(true);
-
 		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
-
 	}
 
 	/**
@@ -1320,6 +1317,32 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Clears the current object and sets all attributes to their default values
+	 */
+	public function clear()
+	{
+		$this->id = null;
+		$this->from_email = null;
+		$this->from_name = null;
+		$this->to_email = null;
+		$this->subject = null;
+		$this->body = null;
+		$this->alt_body = null;
+		$this->sent_date = null;
+		$this->send_at_date = null;
+		$this->is_sent = null;
+		$this->is_html = null;
+		$this->is_failed = null;
+		$this->alreadyInSave = false;
+		$this->alreadyInValidation = false;
+		$this->clearAllReferences();
+		$this->applyDefaultValues();
+		$this->resetModified();
+		$this->setNew(true);
+		$this->setDeleted(false);
+	}
+
+	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -1335,21 +1358,30 @@ abstract class BaseAutomailer extends BaseObject  implements Persistent {
 
 	}
 
-	// symfony_behaviors behavior
-	
 	/**
-	 * Calls methods defined via {@link sfMixer}.
+	 * Catches calls to virtual methods
 	 */
-	public function __call($method, $arguments)
+	public function __call($name, $params)
 	{
-	  if (!$callable = sfMixer::getCallable('BaseAutomailer:'.$method))
-	  {
-	    throw new sfException(sprintf('Call to undefined method BaseAutomailer::%s', $method));
-	  }
-	
-	  array_unshift($arguments, $this);
-	
-	  return call_user_func_array($callable, $arguments);
+		// symfony_behaviors behavior
+		if ($callable = sfMixer::getCallable('BaseAutomailer:' . $name))
+		{
+		  array_unshift($params, $this);
+		  return call_user_func_array($callable, $params);
+		}
+
+		if (preg_match('/get(\w+)/', $name, $matches)) {
+			$virtualColumn = $matches[1];
+			if ($this->hasVirtualColumn($virtualColumn)) {
+				return $this->getVirtualColumn($virtualColumn);
+			}
+			// no lcfirst in php<5.3...
+			$virtualColumn[0] = strtolower($virtualColumn[0]);
+			if ($this->hasVirtualColumn($virtualColumn)) {
+				return $this->getVirtualColumn($virtualColumn);
+			}
+		}
+		return parent::__call($name, $params);
 	}
 
 } // BaseAutomailer
