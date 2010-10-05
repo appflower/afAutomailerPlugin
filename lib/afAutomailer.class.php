@@ -24,7 +24,20 @@ class afAutomailer {
         public static function sendMail($automailer_obj)
         {
               $mail = new PHPMailer();
-              $mail->IsMail();
+              $smtpConf = sfConfig::get('app_afAutomailerPlugin_smtp');
+              if (is_array($smtpConf)) {
+                  $mail->IsSMTP();
+                  $mail->Host = $smtpConf['host'];
+                  if (isset($smtpConf['port'])) {
+                      $mail->Port = $smtpConf['port'];
+                  }
+                  $mail->Username = $smtpConf['username'];
+                  $mail->Password = $smtpConf['password'];
+                  $mail->SMTPAuth = true;
+
+              } else {
+                $mail->IsMail();
+              }
               $mail->From     = $automailer_obj->getFromEmail();
               $mail->FromName = $automailer_obj->getFromName();
               $mail->IsHTML(($automailer_obj->getIsHtml()==1 ? true : false));

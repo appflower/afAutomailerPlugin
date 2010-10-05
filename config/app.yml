@@ -2,3 +2,10 @@
 all:
   afAutomailerPlugin:
     delete_on_success: true
+    # if smtp definition is present - smtp delivery will be used
+    smtp:
+      host: some_host
+      # port option is optional
+      #port: 25
+      username: some_username
+      password: some_password
