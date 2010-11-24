@@ -26,7 +26,7 @@ class afAutomailer {
             $frontendConfiguration = sfProjectConfiguration::getApplicationConfiguration('frontend', 'prod', true);
             $instance = sfContext::createInstance($frontendConfiguration);
 
-            $mail = $instance->getMailer();
+            $mailer = $instance->getMailer();
             
             $message = Swift_Message::newInstance()
               ->setFrom($automailer_obj->getFromEmail(), $automailer_obj->getFromName())
@@ -40,12 +40,12 @@ class afAutomailer {
                 $message->setContentType("text/html");
             }
 
-            if ($mail->send($message) > 0) {
-		if( sfConfig::get('app_afAutomailerPlugin_delete_on_success') ) {
-                      $automailer_obj->delete();
-		} else {
-		    $automailer_obj->markSubmitted();
-		}
+            if ($mailer->send($message) > 0) {
+				if( sfConfig::get('app_afAutomailerPlugin_delete_on_success') ) {
+		                      $automailer_obj->delete();
+				} else {
+				    $automailer_obj->markSubmitted();
+				}
 
                 return true;
             }
