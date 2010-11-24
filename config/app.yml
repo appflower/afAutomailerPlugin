@@ -2,4 +2,4 @@
 all:
   afAutomailerPlugin:
     delete_on_success: false
-    emails_limit: 30
+    emails_limit: 12
