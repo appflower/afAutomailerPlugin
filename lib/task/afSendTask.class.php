@@ -33,6 +33,8 @@ EOF;
     $databaseManager = new sfDatabaseManager($this->configuration);
     $connection = $databaseManager->getDatabase($options['connection'])->getConnection();
 
+    $this->log(date("Y-m-D H:i:s").'> Started the task!');
+    
     $automailer_objs = AutomailerPeer::getEmailsForSending();
 
     $counter = 0;
