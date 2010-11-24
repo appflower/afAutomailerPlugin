@@ -23,11 +23,11 @@ class afAutomailer {
 
         public static function sendMail($automailer_obj)
         {
-            $frontendConfiguration = sfProjectConfiguration::getApplicationConfiguration('frontend', 'dev', true);
+            $frontendConfiguration = sfProjectConfiguration::getApplicationConfiguration('frontend', 'prod', true);
             $instance = sfContext::createInstance($frontendConfiguration);
 
             $mail = $instance->getMailer();
-
+            
             $message = Swift_Message::newInstance()
               ->setFrom($automailer_obj->getFromEmail(), $automailer_obj->getFromName())
               ->setTo($automailer_obj->getToEmail())

@@ -1,4 +1,4 @@
 # default values
 all:
   afAutomailerPlugin:
-    delete_on_success: true
+    delete_on_success: false

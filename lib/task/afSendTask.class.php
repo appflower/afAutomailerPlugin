@@ -44,12 +44,13 @@ EOF;
         if ($automailer_obj->getFromEmail() != '' && $automailer_obj->getToEmail() != '') {
           if (afAutomailer::sendMail($automailer_obj)) {
             $counter++;
+            $this->log(date("Y-m-D H:i:s").'> Email with ID:'.$automailer_obj->getId().' was sent at !');
           }
         }
       }
     }
 
-    $this->log("Nr of emails send: $counter");
+    $this->log(date("Y-m-D H:i:s")."> Nr of emails send: $counter");
     return 0;
   }
 }
