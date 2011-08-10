@@ -17,9 +17,13 @@ So there are 2 branches: sf1.2 and sf1.4.
 
 ## Installation
 
-You can add plugin as svn:external. 
+You can add plugin as git submodule for sf1.4 branch:
 
-	https://appflower.svn.beanstalkapp.com/appflowerplugins/afAutomailerPlugin/branches/_BRANCH_NAME_/
+git submodule add git://github.com/appflower/afAutomailerPlugin.git plugins/afAutoimailerPlugin
+
+and for sf1.2 branch:
+
+git submodule add -b sf1.2 git://github.com/appflower/afAutomailerPlugin.git plugins/afAutoimailerPlugin
 
 
 ## Database
