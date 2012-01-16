@@ -27,31 +27,38 @@ class afAutomailer {
             $instance = sfContext::createInstance($frontendConfiguration);
 
             $mailer = $instance->getMailer();
+
+            try {
             
-            $message = Swift_Message::newInstance()
-              ->setFrom($automailer_obj->getFromEmail(), $automailer_obj->getFromName())
-              ->setTo($automailer_obj->getToEmail())
-              ->setSubject($automailer_obj->getSubject())
-              ->setBody($automailer_obj->getBody())
-              ->addPart($automailer_obj->getAltBody(), 'text/plain');
-            ;
+                $message = Swift_Message::newInstance()
+                ->setFrom($automailer_obj->getFromEmail(), $automailer_obj->getFromName())
+                ->setTo($automailer_obj->getToEmail())
+                ->setSubject($automailer_obj->getSubject())
+                ->setBody($automailer_obj->getBody())
+                ->addPart($automailer_obj->getAltBody(), 'text/plain');
+                ;
 
-            if($automailer_obj->getIsHtml()) {
-                $message->setContentType("text/html");
-            }
+                if($automailer_obj->getIsHtml()) {
+                    $message->setContentType("text/html");
+                }
 
-            if ($mailer->send($message) > 0) {
-				if( sfConfig::get('app_afAutomailerPlugin_delete_on_success') ) {
-		            $automailer_obj->delete();
-				} else {
-				    $automailer_obj->markSubmitted();
-				}
+            
+                if ($mailer->send($message) > 0) {
+                    if( sfConfig::get('app_afAutomailerPlugin_delete_on_success') ) {
+                        $automailer_obj->delete();
+                    } else {
+                        $automailer_obj->markSubmitted();
+                    }
 
-                return true;
-            }
-            else {
-                $automailer_obj->markFailed();
-                return false;
+                    return true;
+                }
+                else {
+                    $automailer_obj->markFailed();
+                    return false;
+                }
+            } catch(Swift_SwiftException $e) {
+                    $automailer_obj->markFailed();
+                    return false;
             }
         }
 
