@@ -7,5 +7,6 @@ all:
 #    smtp:
 #      host: some_host
 #      port: 25
+#      secure: false
 #      username: some_username
 #      password: some_password

@@ -27,9 +27,13 @@ class afAutomailer {
               $smtpConf = sfConfig::get('app_afAutomailerPlugin_smtp');
               if (is_array($smtpConf)) {
                   $mail->IsSMTP();
+                  $mail->SMTPDebug = false;
                   $mail->Host = $smtpConf['host'];
                   if (isset($smtpConf['port'])) {
                       $mail->Port = $smtpConf['port'];
+                  }
+                  if (isset($smtpConf['secure'])) {
+                      $mail->SMTPSecure = $smtpConf['secure'];
                   }
                   $mail->Username = $smtpConf['username'];
                   $mail->Password = $smtpConf['password'];
